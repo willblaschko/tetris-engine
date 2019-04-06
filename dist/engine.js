@@ -49,9 +49,7 @@ class Engine {
             for (let y = 0; y < defaultHeap.length; y++) {
                 let row = [];
                 for (let x = 0; x < this.width; x++) {
-                    row.push({
-                        val: 0
-                    });
+                    row.push();
                 }
                 this._heap.push(row);
             }
@@ -60,7 +58,7 @@ class Engine {
             for (let y = 0; y < inversedDefaultHeap.length && y < this.height; y++) {
                 let row = inversedDefaultHeap[y];
                 for (let x = 0; x < row.length && x < this.width; x++) {
-                    this._heap[y][x].val = inversedDefaultHeap[y][x]
+                    this._heap[y][x] = inversedDefaultHeap[y][x]
                 }
             }
         }
@@ -96,13 +94,13 @@ class Engine {
         if (this._gameStatus !== GAME_STATUS.INIT && this._gameStatus !== GAME_STATUS.PAUSE)
             return false;
 
-        if (this._gameStatus == GAME_STATUS.INIT) {
+        if (this._gameStatus === GAME_STATUS.INIT) {
             this._newFigure();
             this._gameStatus = GAME_STATUS.WORK;
             return true;
         }
 
-        if (this._gameStatus == GAME_STATUS.PAUSE) {
+        if (this._gameStatus === GAME_STATUS.PAUSE) {
             this._gameStatus = GAME_STATUS.WORK;
         }
     }
@@ -171,9 +169,7 @@ class Engine {
     _addShapeToHeap() {
         let newRowForHeap = [];
         for (let i = 0; i < this.width; i++)
-            newRowForHeap.push({
-                val: 0
-            });
+            newRowForHeap.push(0);
 
         for (let y = ShapeDimension - 1; y >= 0; y--) {
             let row = this._shape.body[y];
@@ -192,10 +188,7 @@ class Engine {
                     }
 
                     let areaIndexX = this._getAreaIndexXFromShape(x);
-                    this._heap[areaIndexY][areaIndexX] = {
-                        val: 1,
-                        class: this._shape.name
-                    };
+                    this._heap[areaIndexY][areaIndexX] = 1;
                 }
             }
         }
@@ -214,7 +207,7 @@ class Engine {
             let row = this._heap[y];
             let isThereEmptySquare = false;
             for (let x = 0; x < row.length; x++) {
-                if (!this._heap[y][x].val) {
+                if (!this._heap[y][x]) {
                     isThereEmptySquare = true;
                     break;
                 }
@@ -226,7 +219,7 @@ class Engine {
 
         let newHeap = []
         for (let y = 0; y < this._heap.length; y++) {
-            if (linesToRemove.indexOf(y) == -1)
+            if (linesToRemove.indexOf(y) === -1)
                 newHeap.push(this._heap[y]);
         }
 
@@ -329,14 +322,14 @@ class Engine {
         if (!this._heap)
             return false;
 
-        return this._heap[y] && this._heap[y][x].val;
+        return this._heap[y] && this._heap[y][x];
     }
 
     _getHeapClass(y, x) {
         if (!this._heap)
             return;
 
-        if (!this._heap[y] || !this._heap[y][x].val)
+        if (!this._heap[y] || !this._heap[y][x])
             return;
 
         return this._heap[y][x].class;
@@ -351,15 +344,7 @@ class Engine {
                 let isShape = this._isShapeSquare(y, x);
                 let val = isHeap ? 2 : isShape ? 1 : 0;
 
-                row.push({
-                    val: val,
-                    cssClasses: [
-                        isShape ? 'shape' : null,
-                        isHeap ? 'heap' : null,
-                        isShape ? this._shape.name + '' : null,
-                        isHeap ? this._getHeapClass(y, x) : null
-                    ]
-                });
+                row.push(val);
             }
             body.push(row);
 
@@ -371,11 +356,10 @@ class Engine {
         let response = {
             gameStatus: this._gameStatus,
             body: this._getBody(),
-            shapeName: this._shape ? this._shape.name : null,
             nextShapeName: this._nextShape ? this._nextShape.name : null,
             nextShapeBody: this._nextShape ? this._nextShape.body : null,
             statistic: this._statistic,
-            
+
         }
         if (this._shape) {
             response.shape = {
@@ -389,6 +373,19 @@ class Engine {
             }
         }
         return response;
+    }
+
+    set state(state) {
+        if (!state) {
+            return;
+        }
+        this._statistic = state.statistic; 
+        if (this._nextShape) {
+            this._nextShape.name = state.nextShapeName;
+            this._nextShape.body = state.nextShapeBody;
+        }
+        this.shape = state.shape;
+        this._gameStatus = state.gameStatus;
     }
 
     get shape() {

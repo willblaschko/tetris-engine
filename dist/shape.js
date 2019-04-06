@@ -9,11 +9,9 @@ const ShapeDimension = 5;
 class Shape {
     constructor(shapesSet, X = 5, Y = 12) {
        
-
         if (!shapesSet)
             console.error('Set of shapes was not setted!')
            
-
         this._shape = this._selectNextShape(shapesSet);
 
         this.position = {
