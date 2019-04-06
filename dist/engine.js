@@ -368,14 +368,27 @@ class Engine {
     }
 
     get state() {
-        return {
+        let response = {
             gameStatus: this._gameStatus,
             body: this._getBody(),
             shapeName: this._shape ? this._shape.name : null,
             nextShapeName: this._nextShape ? this._nextShape.name : null,
             nextShapeBody: this._nextShape ? this._nextShape.body : null,
-            statistic: this._statistic
+            statistic: this._statistic,
+            
         }
+        if (this._shape) {
+            response.shape = {
+                position: this._shape.position,
+                paddingLeft: this._shape.paddingLeft,
+                paddingRight: this._shape.paddingRight,
+                paddingTop: this._shape.paddingTop,
+                paddingBottom: this._shape.paddingBottom,
+                name: this._shape.name,
+                shape: this._shape.body
+            }
+        }
+        return response;
     }
 
     get shape() {
@@ -383,13 +396,16 @@ class Engine {
     }
 
     set shape(shape) {
-        let newShape = new Shape(this._shapesSet, shape._position.X, shape._position.Y);
-        newShape.paddingBottom = shape._paddingBottom;
-        newShape.paddingLeft = shape._paddingLeft;
-        newShape.paddingRight = shape._paddingRight;
-        newShape.paddingTop = shape._paddingTop;
-        newShape.name = shape._name;
-        newShape.body = shape._shape;
+        if (!shape) {
+            return;
+        }
+        let newShape = new Shape(this._shapesSet, shape.position.X, shape.position.Y);
+        newShape.paddingBottom = shape.paddingBottom;
+        newShape.paddingLeft = shape.paddingLeft;
+        newShape.paddingRight = shape.paddingRight;
+        newShape.paddingTop = shape.paddingTop;
+        newShape.name = shape.name;
+        newShape.body = shape.shape;
         this._shape = newShape;
     }
 }
