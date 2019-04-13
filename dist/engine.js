@@ -39,7 +39,7 @@ class Engine {
             countShapesFalledByType: {},
             countLinesReduced: 0,
             countDoubleLinesReduced: 0,
-            countTrippleLinesReduced: 0,
+            countTripleLinesReduced: 0,
             countQuadrupleLinesReduced: 0
         }
 
@@ -166,6 +166,16 @@ class Engine {
         this._renderHandle(this.state);
     }
 
+    drop() {
+        if (this._gameStatus !== GAME_STATUS.WORK)
+            return;
+
+        while (this._canShapeMove(-2, 0)) {
+            this._shape.position.Y--;
+        }
+        this.moveDown();
+    }
+
     _addShapeToHeap() {
         let newRowForHeap = [];
         for (let i = 0; i < this.width; i++)
@@ -229,7 +239,7 @@ class Engine {
                 this._statistic.countDoubleLinesReduced++;
                 break;
             case 3:
-                this._statistic.countTrippleLinesReduced++;
+                this._statistic.countTripleLinesReduced++;
                 break;
             case 4:
                 this._statistic.countQuadrupleLinesReduced++;
@@ -380,7 +390,10 @@ class Engine {
             return;
         }
         this._statistic = state.statistic; 
-        if (this._nextShape) {
+        if (!this._nextShape) {
+            this._nextShape = new Shape(this._shapesSet, parseInt(this.width / 2 - 3), this.height);
+        }
+        if (state.nextShapeBody) {
             this._nextShape.name = state.nextShapeName;
             this._nextShape.body = state.nextShapeBody;
         }
@@ -405,6 +418,7 @@ class Engine {
         newShape.body = shape.shape;
         this._shape = newShape;
     }
+    
 }
 
 /**
